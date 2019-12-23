@@ -49,6 +49,34 @@ The "ScrollView (broken)" version loses the ability to scroll immediately after 
 
 The "ScrollView (fixed)" version loses the ability to scroll immediately after pressing the nav button, though it works fine when navigating back. Only the "FlatList (fixed)" version seems to work perfectly, always allowing scrolling after any navigation action.
 
+## The fix, tl;dr
+
+Replace screen component code like:
+
+```js
+const MyScreen = () => (
+  <ScrollView>
+    ...
+  </ScrollView>
+);
+
+export default MyScreen;
+```
+
+with:
+
+```js
+import { withNavigationFocus } from 'react-navigation';
+
+const MyScreen = ({ isFocused }) => !isFocused ? null : (
+  <ScrollView>
+    ...
+  </ScrollView>
+);
+
+export default withNavigationFocus(MyScreen);
+```
+
 ## The fix, explained
 
 The "fixed" variants use `withNavigationFocus` to determine if the screen is currently being shown or not. If the screen is not shown, it will return `null`; otherwise, it renders the screen components. This essentially un-mounts and re-mounts the `ScrollView`, forcing it to get a fresh and accurate measurement of the screen and, thus, enables scrolling.
