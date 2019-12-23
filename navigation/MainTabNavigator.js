@@ -7,6 +7,9 @@ import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import LinksScreen from '../screens/LinksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import FixedSettingsScreen from '../screens/FixedSettingsScreen';
+import FlatListSettingsScreen from '../screens/FlatListSettingsScreen';
+import FixedFlatListSettingsScreen from '../screens/FixedFlatListSettingsScreen';
 
 const config = Platform.select({
   web: { headerMode: 'screen' },
@@ -52,26 +55,33 @@ LinksStack.navigationOptions = {
 
 LinksStack.path = '';
 
-const SettingsStack = createStackNavigator(
-  {
-    Settings: SettingsScreen,
-  },
-  config
-);
+const createSettingsNavigator = (key, screen, tabBarLabel) => {
+  const StackNavigator = createStackNavigator(
+    {
+      [key]: screen,
+    },
+    config
+  );
 
-SettingsStack.navigationOptions = {
-  tabBarLabel: 'Settings',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'} />
-  ),
+  StackNavigator.navigationOptions = {
+    tabBarLabel,
+    tabBarIcon: ({ focused }) => (
+      <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'} />
+    ),
+  };
+
+  StackNavigator.path = '';
+
+  return StackNavigator;
 };
 
-SettingsStack.path = '';
-
 const tabNavigator = createBottomTabNavigator({
-  HomeStack,
-  LinksStack,
-  SettingsStack,
+  SettingsStack: createSettingsNavigator('Settings', SettingsScreen, 'ScrollView (broken)'),
+  FixedSettingsStack: createSettingsNavigator('FixedSettings', FixedSettingsScreen, 'ScrollView (fixed)'),
+  FlatListSettingsStack: createSettingsNavigator('FlatListSettings', FlatListSettingsScreen, 'FlatList (broken)'),
+  FixedFlatListSettingsStack: createSettingsNavigator('FixedFlatListSettings', FixedFlatListSettingsScreen, 'FlatList (fixed)'),
+}, {
+  order: ['SettingsStack', 'FixedSettingsStack', 'FlatListSettingsStack', 'FixedFlatListSettingsStack'],
 });
 
 tabNavigator.path = '';
